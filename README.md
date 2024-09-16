@@ -1,1 +1,1 @@
-# Ecom-MERN
+# E-commerce MERN Stack
