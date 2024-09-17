@@ -3,9 +3,19 @@ const morgan = require('morgan');
 
 const bodyParser = require('body-parser'); //for express middleware
 const createError = require('http-errors');  //for error handling
+const xssClean = require('xss-clean')
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
+const rateLimiter = rateLimit({
+	windowMs: 1 * 60 * 1000, // 1 minute
+    max: 5,
+    message: 'Too many requests from this IP. Please try again later'
+});
+
+app.use(rateLimiter);
+app.use(xssClean());  //API secure
 app.use(morgan("dev"));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
@@ -17,7 +27,7 @@ app.get('/', (req, res) => {
     return res.status(200).send("<h1>Welcome to E-commerce Project</h1>");
 });
 
-app.get('/test', (req, res) => {
+app.get('/test', rateLimiter, (req, res) => {
     return res.status(200).send({ message: 'API Testing is Working Properly' });
 });
 
