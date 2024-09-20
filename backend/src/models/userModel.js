@@ -1,16 +1,54 @@
-const users = [
-    {
-        id : 1,
-        name : 'John',
-    },
-    {
-        id : 2,
-        name : 'John Smith',
-    },
-    {
-        id : 3,
-        name : 'John Smith Smith',
-    }
-];
+const { Schema, model, set } = require('mongoose');
+const bcrypt = require('bcrypt');
+const { defaultImagePath } = require('../secret');
 
-module.exports = users;
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: [true, 'The name field is required.'],
+        trim: true,
+        minlength: [3, 'The name must be at least 3 characters long.'],
+        maxlenght: [35, 'The name cannot be more than 35 characters long.'],
+    },
+    email: {
+        type: String,
+        required: [true, 'The email field is required.'],
+        trim: true,
+        unique: true,
+        lowercase: true,
+        validate: {
+            validator: function(value) {
+                return /^\w+([\-]?\w+)*@\w+([\-.]?\w+)*(\.\w{2,3})+$/.test(v);
+            },
+            message: 'Please enter a valid email'
+        },
+    },
+    password: {
+        type: String,
+        required: [true, 'The password field is required.'],
+        minlength: [8, 'The name must be at least 8 characters long.'],
+        set: (value) => bcrypt.hashSync(value, bcrypt.genSaltSync(10))
+    },
+    image: {
+        type: String,
+        default: defaultImagePath
+    },
+    address: {
+        type: String,
+        required: [true, 'The address field is required.'],
+    },
+    phone: {
+        type: String,
+        required: [true, 'The phone field is required.'],
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    },
+    isBanned: {
+        type: Boolean,
+        default: false,
+    }
+}, {timestamps: true});
+
+module.exports = model('User', userSchema);
