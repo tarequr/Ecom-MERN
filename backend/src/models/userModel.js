@@ -1,4 +1,4 @@
-const { Schema, model, set } = require('mongoose');
+const { Schema, model } = require('mongoose');
 const bcrypt = require('bcrypt');
 const { defaultImagePath } = require('../secret');
 
@@ -18,7 +18,7 @@ const userSchema = new Schema({
         lowercase: true,
         validate: {
             validator: function(value) {
-                return /^\w+([\-]?\w+)*@\w+([\-.]?\w+)*(\.\w{2,3})+$/.test(v);
+                return /^\w+([\-]?\w+)*@\w+([\-.]?\w+)*(\.\w{2,3})+$/.test(value);
             },
             message: 'Please enter a valid email'
         },
