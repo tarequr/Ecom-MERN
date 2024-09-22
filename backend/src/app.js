@@ -5,6 +5,7 @@ const bodyParser = require('body-parser'); //for express middleware
 const createError = require('http-errors');  //for error handling
 const xssClean = require('xss-clean')
 const rateLimit = require('express-rate-limit');
+const { errorResponse } = require('./helpers/responseHandler.js');
 
 const app = express();
 
@@ -57,9 +58,16 @@ app.use((err, req, res, next) => {
     // console.error(err.stack);
     // res.status(500).send('Something broke!');
 
-    return res.status(err.status || 500).json({
-        success: false,
-        message: err.message // this message come from next(createError(404, 'Route not found.'));
+    // 2d
+    // return res.status(err.status || 500).json({
+    //     success: false,
+    //     message: err.message // this message come from next(createError(404, 'Route not found.'));
+    // });
+
+    // 3rd
+    return errorResponse(res, {         // custom error handling
+        statusCode: err.status,
+        message: err.message
     });
 });
 
