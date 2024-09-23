@@ -3,6 +3,7 @@ const createError = require('http-errors');
 
 const User = require('../models/userModel');
 const { successResponse } = require('../helpers/responseHandler');
+const { findUserById } = require('../services/findUser');
 
 const getUsers = async (req, res, next) => {
     try {
@@ -59,29 +60,15 @@ const getUsers = async (req, res, next) => {
 const getUser = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const options = { password: 0 };
-
-        // Check if the ID is a valid MongoDB ObjectId
-        // if (!mongoose.Types.ObjectId.isValid(id)) {
-        //     throw createError(400, "Invalid user ID");
-        // }
-
-        const user = await User.findById(id, options);
-
-        if (!user) {
-            throw createError(404, "User does not exist!");
-        }
+        
+        const user = await findUserById(id);
 
         return successResponse(res, {
             statusCode: 200,
             message: 'User data fatch successfully',
             payload: { user }
         });
-    } catch (error) {
-        if (error instanceof mongoose.Error) {
-            next(createError(400, "Invalid user ID"));
-            return;
-        }
+    } catch (error) {   
         next(error);
     }
 }
