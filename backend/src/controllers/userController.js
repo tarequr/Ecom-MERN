@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const createError = require('http-errors');
+const fs = require('fs');
 
 const User = require('../models/userModel');
 const { successResponse } = require('../helpers/responseHandler');
@@ -74,4 +75,34 @@ const getUser = async (req, res, next) => {
     }
 }
 
-module.exports = { getUsers, getUser };
+const deleteUser = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const options = { password: 0 };
+
+        const user = await findWithId(id, options);
+
+        const userImagePath = user.image;
+        fs.access(userImagePath, (err) => {
+            if (err) {
+                console.error("User image does not exist!");
+            } else {
+                fs.unlink(userImagePath, (err) => {
+                    if (err) throw err;
+                    console.log("User image was deleted!");
+                });
+            }
+        }); 
+
+        await User.findByIdAndDelete({ _id: id, isAdmin: false });
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User deleted successfully',
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { getUsers, getUser, deleteUser };
