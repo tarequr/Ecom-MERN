@@ -1,8 +1,10 @@
 const express = require('express');
-const { getUsers } = require('../controllers/userController');
+const { getUsers, getUser } = require('../controllers/userController');
 let router = express.Router();
 
-
+// #1 - Featch All
 router.get('/', getUsers);
+// #2 - Featch One
+router.get('/:id', getUser);
 
 module.exports = router;
