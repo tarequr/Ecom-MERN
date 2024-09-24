@@ -1,12 +1,12 @@
 const express = require('express');
-const { getUsers, getUser, deleteUser } = require('../controllers/userController');
+const { getUsers, getUserById, deleteUserById } = require('../controllers/userController');
 let router = express.Router();
 
 // #1 - Featch All
 router.get('/', getUsers);
 // #2 - Featch One
-router.get('/:id', getUser);
+router.get('/:id', getUserById);
 // #3 - Delete One
-router.delete('/:id', deleteUser);
+router.delete('/:id', deleteUserById);
 
 module.exports = router;
