@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const createError = require('http-errors');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 const User = require('../models/userModel');
 const { successResponse } = require('../helpers/responseHandler');
 const { findWithId } = require('../services/findItem');
+const { deleteImage } = require('../helpers/deleteImage');
 
 const getUsers = async (req, res, next) => {
     try {
@@ -83,16 +84,27 @@ const deleteUserById = async (req, res, next) => {
         const user = await findWithId(User, id, options);
 
         const userImagePath = user.image;
-        fs.access(userImagePath, (err) => {
-            if (err) {
-                console.error("User image does not exist!");
-            } else {
-                fs.unlink(userImagePath, (err) => {
-                    if (err) throw err;
-                    console.log("User image was deleted!");
-                });
-            }
-        }); 
+
+        // 1st way
+        // fs.access(userImagePath, (err) => {
+        //     if (err) {
+        //         console.error("User image does not exist!");
+        //     } else {
+        //         fs.unlink(userImagePath, (err) => {
+        //             if (err) throw err;
+        //             console.log("User image was deleted!");
+        //         });
+        //     }
+        // }); 
+
+        // 2nd way
+        // fs.access(userImagePath)
+        //     .then(() => fs.unlink(userImagePath))
+        //     .then(() => console.log("User image was deleted!"))
+        //     .catch((err) => console.error("User image does not exist!"));
+
+        // 3rd way
+        deleteImage(userImagePath);
 
         await User.findByIdAndDelete({ _id: id, isAdmin: false });
 
