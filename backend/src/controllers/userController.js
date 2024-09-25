@@ -7,6 +7,34 @@ const { successResponse } = require('../helpers/responseHandler');
 const { findWithId } = require('../services/findItem');
 const { deleteImage } = require('../helpers/deleteImage');
 
+const processRegister = async (req, res, next) => {
+    try {
+        const { name, email, password, phone, address } = req.body;
+
+        const newUser = {
+            name, 
+            email, 
+            password, 
+            phone, 
+            address
+        }
+
+        const userExists = await User.exists({ email: email });
+
+        if (userExists) {
+            throw createError(409, 'User already exists');
+        }
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User created successfully',
+            payload: { newUser }
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
 const getUsers = async (req, res, next) => {
     try {
         const search = req.query.search || "";
@@ -117,4 +145,4 @@ const deleteUserById = async (req, res, next) => {
     }
 }
 
-module.exports = { getUsers, getUserById, deleteUserById };
+module.exports = { processRegister, getUsers, getUserById, deleteUserById };

@@ -1,12 +1,14 @@
 const express = require('express');
-const { getUsers, getUserById, deleteUserById } = require('../controllers/userController');
+const { getUsers, getUserById, deleteUserById, processRegister } = require('../controllers/userController');
 let router = express.Router();
 
-// #1 - Featch All
+// #1 - Process Register
+router.post('/process-register', processRegister);
+// #2 - Featch All
 router.get('/', getUsers);
-// #2 - Featch One
+// #3 - Featch One
 router.get('/:id', getUserById);
-// #3 - Delete One
+// #4 - Delete One
 router.delete('/:id', deleteUserById);
 
 module.exports = router;
