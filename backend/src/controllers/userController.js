@@ -7,7 +7,7 @@ const { successResponse } = require('../helpers/responseHandler');
 const { findWithId } = require('../services/findItem');
 const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
-const { jwtActivationKey } = require('../secret');
+const { jwtActivationKey, clientURL } = require('../secret');
 
 const processRegister = async (req, res, next) => {
     try {
@@ -29,6 +29,16 @@ const processRegister = async (req, res, next) => {
 
         //create JWT token
         const token = createJSONWebToken({ name, email, password, phone, address }, jwtActivationKey, '10m');
+
+        //prepare email
+        const emailData = {
+            email: email,
+            subject: 'Account Activation Email',
+            html: `
+                <h2>Hello ${name} ! </h2>
+                <p>Please click here to <a href="${clientURL}/api/users/activate/${token}" target="_blank">Activate your account</a></p>
+            `,
+        }
 
         return successResponse(res, {
             statusCode: 200,
