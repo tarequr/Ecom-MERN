@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const createError = require('http-errors');
+const jwt = require('jsonwebtoken');
 const fs = require('fs').promises;
 
 const User = require('../models/userModel');
@@ -51,6 +52,24 @@ const processRegister = async (req, res, next) => {
             statusCode: 200,
             message: `Please go to your ${email} for complete verification`,
             payload: { newUser, token }
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+const activeUserAccount = async (req, res, next) => {
+    try {
+        const token = req.body.token;
+
+        if (!token) throw createError(404, "Token not found");
+
+        const decoded = jwt.verify(token, jwtActivationKey);
+        const user = User.create(decoded);
+
+        return successResponse(res, {
+            statusCode: 201,
+            message: "User registered successfully"
         });
     } catch (error) {   
         next(error);
@@ -167,4 +186,4 @@ const deleteUserById = async (req, res, next) => {
     }
 }
 
-module.exports = { processRegister, getUsers, getUserById, deleteUserById };
+module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount };
