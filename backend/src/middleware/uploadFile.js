@@ -1,7 +1,12 @@
 const multer  = require('multer')
 const fs = require('fs');  // Make sure to import the 'fs' module
 const path = require('path');
-const { uploadDir } = require('../secret')
+const createError = require('http-errors');
+
+const maxFileSize = Number(process.env.MAX_FILE_SIZE) || 2097152;
+const fileTypes   = process.env.FILE_TYPES || ['jpg', 'png', 'jpeg'];
+
+const uploadDir   = process.env.UPLOAD_FILE || "src/public/images/users";
 
 // Ensure the upload directory exists, or create it
 if (!fs.existsSync(uploadDir)) {
@@ -20,6 +25,20 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {                 //cb means callback  
+    const extname = path.extname(file.originalname);
+
+    if (!fileTypes.includes(extname.substring(1))) {
+        return cb(createError(400, 'File type not allowed'));
+    }
+
+    cb(null, true);
+}
+
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: maxFileSize },
+    fileFilter
+});
 
 module.exports = upload;
