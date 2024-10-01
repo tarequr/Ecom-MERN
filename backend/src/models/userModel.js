@@ -26,7 +26,7 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: [true, 'The password field is required.'],
-        minlength: [8, 'The name must be at least 8 characters long.'],
+        minlength: [8, 'The password must be at least 8 characters long.'],
         set: (value) => bcrypt.hashSync(value, bcrypt.genSaltSync(10))
     },
     image: {
@@ -36,6 +36,7 @@ const userSchema = new Schema({
     address: {
         type: String,
         required: [true, 'The address field is required.'],
+        minlength: [3, 'The address must be at least 3 characters long.'],
     },
     phone: {
         type: String,

@@ -6,7 +6,7 @@ const runValidation = require('../validators');
 let router = express.Router();
 
 // #1 - Process Register
-router.post('/process-register', validateUserRegistration, runValidation, upload.single("image"), processRegister);
+router.post('/process-register', upload.single("image"), validateUserRegistration, runValidation, processRegister);
 router.post('/verify', activeUserAccount);
 // #2 - Featch All
 router.get('/', getUsers);

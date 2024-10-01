@@ -15,6 +15,31 @@ const validateUserRegistration = [
         .withMessage('The email field is required.')
         .isEmail()
         .withMessage('Invalid email address.'),
+
+    body('password')
+        .trim()
+        .notEmpty()
+        .withMessage('The password field is required.')
+        .isLength({ min: 8 })
+        .withMessage('The name must be at least 8 characters long.')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+        .withMessage('Password should contain at least one uppercase letter, one lowercase letter, one number, and one special character.'),
+
+    body('address')
+        .trim()
+        .notEmpty()
+        .withMessage('The address field is required.')
+        .isLength({ min: 3 })
+        .withMessage('The name must be at least 3 characters long.'),
+    
+    body('phone')
+        .trim()
+        .notEmpty()
+        .withMessage('The phone field is required.'),
+
+    body('phone')
+        .optional()
+        .isString(),
 ];
 
 // sign in validation
