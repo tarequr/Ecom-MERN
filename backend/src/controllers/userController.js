@@ -23,6 +23,12 @@ const processRegister = async (req, res, next) => {
             address
         }
 
+        if (!req.file) {
+            
+        }
+
+        const imageBufferString = req.file.buffer.toString('base64');
+
         const userExists = await User.exists({ email: email });
 
         if (userExists) {
@@ -30,7 +36,7 @@ const processRegister = async (req, res, next) => {
         }
 
         //create JWT token
-        const token = createJSONWebToken({ name, email, password, phone, address }, jwtActivationKey, '10m');
+        const token = createJSONWebToken({ name, email, password, phone, address, image: imageBufferString }, jwtActivationKey, '10m');
 
         //prepare email
         const emailData = {
@@ -51,7 +57,7 @@ const processRegister = async (req, res, next) => {
         return successResponse(res, {
             statusCode: 200,
             message: `Please go to your ${email} for complete verification`,
-            payload: { newUser, token }
+            payload: { newUser, token, image: imageBufferString }
         });
     } catch (error) {   
         next(error);

@@ -37,9 +37,16 @@ const validateUserRegistration = [
         .notEmpty()
         .withMessage('The phone field is required.'),
 
-    body('phone')
-        .optional()
-        .isString(),
+    body('image')
+        .custom((value, { req }) => {
+            if (!req.file || !req.file.buffer) {
+                throw new Error('The image field is required.');
+            }
+            return true;
+        })
+        .withMessage('The image field is required.'),
+        // .optional()
+        // .isString(),
 ];
 
 // sign in validation

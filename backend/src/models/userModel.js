@@ -31,7 +31,8 @@ const userSchema = new Schema({
     },
     image: {
         type: Buffer,
-        contentType: String
+        contentType: String,
+        required: [true, 'The image field is required.'],
         // type: String,
         // default: defaultImagePath
     },
