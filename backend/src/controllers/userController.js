@@ -11,6 +11,7 @@ const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
 
+
 const processRegister = async (req, res, next) => {
     try {
         const { name, email, password, phone, address } = req.body;
@@ -23,11 +24,20 @@ const processRegister = async (req, res, next) => {
             address
         }
 
-        if (!req.file) {
-            
+        const image = req.file;
+
+        if (!image) {
+            throw createError(400, 'Image field is required.')
         }
 
-        const imageBufferString = req.file.buffer.toString('base64');
+        if (image.size > 1024 * 1024 * 2) {
+            throw createError(400, 'File size must be between 2 MB')
+        }
+
+        // console.log(image);
+        // console.log(image);
+
+        const imageBufferString = image.buffer.toString('base64');
 
         const userExists = await User.exists({ email: email });
 
@@ -35,8 +45,9 @@ const processRegister = async (req, res, next) => {
             throw createError(409, 'User already exists');
         }
 
+        // , image: imageBufferString
         //create JWT token
-        const token = createJSONWebToken({ name, email, password, phone, address, image: imageBufferString }, jwtActivationKey, '10m');
+        const token = createJSONWebToken({ name, email, password, phone, address }, jwtActivationKey, '10m');
 
         //prepare email
         const emailData = {
@@ -211,4 +222,44 @@ const deleteUserById = async (req, res, next) => {
     }
 }
 
-module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount };
+const updateUserById = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const updateOptions = { new: true, runValidators: true, Context: 'query' };
+
+        let updates = {}
+
+        if (req.body.name) {
+            updates.name = req.body.name;
+        }
+
+        if (req.body.password) {
+            updates.password = req.body.password;
+        }
+
+        if (req.body.phone) {
+            updates.phone = req.body.phone;
+        }
+
+        if (req.body.address) {
+            updates.address = req.body.address;
+        }
+
+        const image = req.file;
+
+        if (image) {
+            if (image.size > 1024 * 1024 * 2) {
+                throw createError(400, 'File size must be between 2 MB')
+            } 
+        }
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User updated successfully',
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount, updateUserById };
