@@ -15,7 +15,7 @@ router.get('/', getUsers);
 router.get('/:id', getUserById);
 // #5 - Delete One
 router.delete('/:id', deleteUserById);
-// #5 - Delete One
-router.put('/:id', updateUserById);
+// #6 - Update One
+router.put('/:id', upload.single("image"), updateUserById);
 
 module.exports = router;
