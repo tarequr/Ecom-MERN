@@ -24,20 +24,23 @@ const processRegister = async (req, res, next) => {
             address
         }
 
-        const image = req.file;
+        // const image = req.file;
 
-        if (!image) {
-            throw createError(400, 'Image field is required.')
-        }
+        // if (!image) {
+        //     throw createError(400, 'Image field is required.')
+        // }
 
-        if (image.size > 1024 * 1024 * 2) {
+        // if (image.size > 1024 * 1024 * 2) {
+        //     throw createError(400, 'File size must be between 2 MB')
+        // }
+
+        // const imageBufferString = image.buffer.toString('base64');
+
+        // anoher way
+        const image = req.file.path;
+        if (image && image.size > 1024 * 1024 * 2) {
             throw createError(400, 'File size must be between 2 MB')
         }
-
-        // console.log(image);
-        // console.log(image);
-
-        const imageBufferString = image.buffer.toString('base64');
 
         const userExists = await User.exists({ email: email });
 
@@ -47,7 +50,12 @@ const processRegister = async (req, res, next) => {
 
         // , image: imageBufferString
         //create JWT token
-        const token = createJSONWebToken({ name, email, password, phone, address }, jwtActivationKey, '10m');
+        const tokenPayload = { name, email, password, phone, address }
+        if (image) {
+            tokenPayload.image = image;
+        }
+
+        const token = createJSONWebToken(tokenPayload, jwtActivationKey, '10m');
 
         //prepare email
         const emailData = {
@@ -68,7 +76,7 @@ const processRegister = async (req, res, next) => {
         return successResponse(res, {
             statusCode: 200,
             message: `Please go to your ${email} for complete verification`,
-            payload: { newUser, token, image: imageBufferString }
+            payload: { newUser, token }
         });
     } catch (error) {   
         next(error);
