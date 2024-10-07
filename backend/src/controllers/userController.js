@@ -235,7 +235,7 @@ const updateUserById = async (req, res, next) => {
         const userId = req.params.id;
         const options = { password: 0 };
 
-        await findWithId(User, userId, options);
+        const user = await findWithId(User, userId, options);
 
         const updateOptions = { new: true, runValidators: true, Context: 'query' };
 
@@ -272,7 +272,9 @@ const updateUserById = async (req, res, next) => {
                 throw createError(400, 'File size must be between 2 MB')
             } 
 
-            updates.image = image.buffer.toString('base64');
+            // updates.image = image.buffer.toString('base64');
+            updates.image = image;
+            user.image != 'default.png' && deleteImage(user.image);
         }
 
         // delete updates.email;
