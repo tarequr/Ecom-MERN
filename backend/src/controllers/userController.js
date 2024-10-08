@@ -37,7 +37,7 @@ const processRegister = async (req, res, next) => {
         // const imageBufferString = image.buffer.toString('base64');
 
         // anoher way
-        const image = req.file.path;
+        const image = req.file?.path;
         if (image && image.size > 1024 * 1024 * 2) {
             throw createError(400, 'File size must be between 2 MB')
         }
@@ -265,7 +265,7 @@ const updateUserById = async (req, res, next) => {
             }
         }
 
-        const image = req.file;
+        const image = req.file?.path;
 
         if (image) {
             if (image.size > 1024 * 1024 * 2) {
