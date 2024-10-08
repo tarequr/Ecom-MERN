@@ -8,7 +8,7 @@ let router = express.Router();
 // #1 - Process Register
 router.post('/process-register', uploadUserImage.single("image"), validateUserRegistration, runValidation, processRegister);
 // #2 - Process Register
-router.post('/verify', activeUserAccount);
+router.post('/active', activeUserAccount);
 // #3 - Featch All
 router.get('/', getUsers);
 // #4 - Featch One
