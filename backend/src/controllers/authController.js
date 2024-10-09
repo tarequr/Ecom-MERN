@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const { successResponse } = require('../helpers/responseHandler');
 const { jwtAccessKey } = require('../secret');
+const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 
 
 const handleLogin = async (req, res, next) => {
@@ -29,6 +30,12 @@ const handleLogin = async (req, res, next) => {
 
         //create JWT token
         const accessToken = createJSONWebToken({ email }, jwtAccessKey, '10m');
+        res.cookie('access_token', accessToken, {
+            maxAge: 15 * 60 * 1000,  // 15 minutes
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
 
         return successResponse(res, {
             statusCode: 200,

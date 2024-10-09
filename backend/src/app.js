@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 const bodyParser = require('body-parser'); //for express middleware
 const createError = require('http-errors');  //for error handling
