@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const { successResponse } = require('../helpers/responseHandler');
+const { jwtAccessKey } = require('../secret');
 
 
 const handleLogin = async (req, res, next) => {
@@ -25,6 +26,9 @@ const handleLogin = async (req, res, next) => {
         if (user.isBanned) {
             throw createError(403, 'You are Banned. Please contact with authority!');
         }
+
+        //create JWT token
+        const accessToken = createJSONWebToken({ email }, jwtAccessKey, '10m');
 
         return successResponse(res, {
             statusCode: 200,
