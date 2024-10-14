@@ -30,7 +30,7 @@ const handleLogin = async (req, res, next) => {
 
         //create JWT token
         const accessToken = createJSONWebToken({ email }, jwtAccessKey, '10m');
-        res.cookie('access_token', accessToken, {
+        res.cookie('accessToken', accessToken, {
             maxAge: 15 * 60 * 1000,  // 15 minutes
             httpOnly: true,
             secure: true,
@@ -49,7 +49,7 @@ const handleLogin = async (req, res, next) => {
 
 const handleLogout = async (req, res, next) => {
     try {
-        res.clearCookie('access_token');
+        res.clearCookie('accessToken');
 
         return successResponse(res, {
             statusCode: 200,

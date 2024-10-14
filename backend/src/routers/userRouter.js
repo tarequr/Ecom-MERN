@@ -3,6 +3,7 @@ const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccoun
 const uploadUserImage = require('../middleware/uploadFile');
 const { validateUserRegistration } = require('../validators/auth');
 const runValidation = require('../validators');
+const { isLoggedIn } = require('../middleware/auth');
 let router = express.Router();
 
 // #1 - Process Register
@@ -12,7 +13,7 @@ router.post('/active', activeUserAccount);
 // #3 - Featch All
 router.get('/', getUsers);
 // #4 - Featch One
-router.get('/:id', getUserById);
+router.get('/:id', isLoggedIn, getUserById);
 // #5 - Delete One
 router.delete('/:id', deleteUserById);
 // #6 - Update One
