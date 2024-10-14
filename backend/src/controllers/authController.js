@@ -39,7 +39,7 @@ const handleLogin = async (req, res, next) => {
 
         return successResponse(res, {
             statusCode: 200,
-            message: 'User loggedin successfully!',
+            message: 'User logged in successfully!',
             payload: { user }
         });
     } catch (error) {   
@@ -47,4 +47,17 @@ const handleLogin = async (req, res, next) => {
     }
 }
 
-module.exports = { handleLogin };
+const handleLogout = async (req, res, next) => {
+    try {
+        res.clearCookie('access_token');
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User logged out successfully!'
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { handleLogin, handleLogout };

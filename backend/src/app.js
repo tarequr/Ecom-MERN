@@ -16,6 +16,7 @@ const rateLimiter = rateLimit({
     message: 'Too many requests from this IP. Please try again later'
 });
 
+app.use(cookieParser());
 app.use(rateLimiter);
 app.use(xssClean());  //API secure
 app.use(morgan("dev"));
