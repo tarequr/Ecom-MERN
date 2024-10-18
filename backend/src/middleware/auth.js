@@ -45,4 +45,16 @@ const isLoggedOut = async (req, res, next) => {
     }
 }
 
-module.exports = { isLoggedIn, isLoggedOut }
+const isAdmin = async (req, res, next) => {
+    try {
+        if (!req.user.isAdmin) {
+            throw createError(403, 'Forbidden. You must be an administrator');
+        }
+
+        next();
+    } catch (error) {
+        return next(error);
+    }
+}
+
+module.exports = { isLoggedIn, isLoggedOut, isAdmin }
