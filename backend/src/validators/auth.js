@@ -50,5 +50,19 @@ const validateUserRegistration = [
 ];
 
 // sign in validation
+const validateUserLogin = [
+    body('email')
+        .trim()
+        .notEmpty()
+        .withMessage('The email field is required.')
+        .isEmail()
+        .withMessage('Invalid email address.'),
 
-module.exports = { validateUserRegistration };
+    body('password')
+        .trim()
+        .notEmpty()
+        .withMessage('The password field is required.')
+];
+
+
+module.exports = { validateUserRegistration, validateUserLogin };
