@@ -196,7 +196,7 @@ const deleteUserById = async (req, res, next) => {
 
         const user = await findWithId(User, id, options);
 
-        const userImagePath = user.image;
+        // const userImagePath = user.image;
 
         // 1st way
         // fs.access(userImagePath, (err) => {
@@ -217,7 +217,7 @@ const deleteUserById = async (req, res, next) => {
         //     .catch((err) => console.error("User image does not exist!"));
 
         // 3rd way
-        deleteImage(userImagePath);
+        // deleteImage(userImagePath);
 
         await User.findByIdAndDelete({ _id: id, isAdmin: false });
 
