@@ -10,6 +10,7 @@ const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
+const { hadleUserAction } = require('../services/userService');
 
 
 const processRegister = async (req, res, next) => {
@@ -298,28 +299,9 @@ const updateUserById = async (req, res, next) => {
 const handleManageUserStatusById = async (req, res, next) => {
     try {
         const userId = req.params.id;
-        const action = req.body.action
+        const action = req.body.action;
 
-        let update;
-        let successMessage;
-
-        if (action == 'ban') {
-            update = { isBanned: true }
-            successMessage = "User is banned successfully!";
-        } else if (action == 'unban') {
-            update = { isBanned: false }
-            successMessage = "User is unbanned successfully!";
-        } else {
-            throw createError(400, 'Invalid action. Use "ban" or "unban"');
-        }
-
-        const updateOptions = { new: true, runValidators: true, Context: 'query' };
-
-        const updatedUser = await User.findByIdAndUpdate(userId, update, updateOptions).select("-password");
-
-        if (!updatedUser) {
-            throw createError(400, `User was not ${successMessage} successfully`);
-        }
+        const { successMessage, updatedUser } = await hadleUserAction(userId, action);
 
         return successResponse(res, {
             statusCode: 200,
