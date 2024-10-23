@@ -10,7 +10,7 @@ const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
-const { hadleUserAction, findUsers } = require('../services/userService');
+const { hadleUserAction, findUsers, findUserById } = require('../services/userService');
 
 
 const processRegister = async (req, res, next) => {
@@ -152,7 +152,7 @@ const getUserById = async (req, res, next) => {
         const id = req.params.id;
         const options = { password: 0 };
 
-        const user = await findWithId(User, id, options);
+        const user = await findUserById(id, options);
 
         return successResponse(res, {
             statusCode: 200,
