@@ -10,7 +10,7 @@ const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
-const { hadleUserAction, findUsers, findUserById } = require('../services/userService');
+const { hadleUserAction, findUsers, findUserById, handleDeleteUserById } = require('../services/userService');
 
 
 const processRegister = async (req, res, next) => {
@@ -167,9 +167,7 @@ const getUserById = async (req, res, next) => {
 const deleteUserById = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const options = { password: 0 };
-
-        const user = await findWithId(User, id, options);
+        await handleDeleteUserById(id);
 
         // const userImagePath = user.image;
 
@@ -194,7 +192,7 @@ const deleteUserById = async (req, res, next) => {
         // 3rd way
         // deleteImage(userImagePath);
 
-        await User.findByIdAndDelete({ _id: id, isAdmin: false });
+        
 
         return successResponse(res, {
             statusCode: 200,
