@@ -10,7 +10,7 @@ const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
-const { hadleUserAction, findUsers, findUserById, handleDeleteUserById } = require('../services/userService');
+const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById } = require('../services/userService');
 
 
 const processRegister = async (req, res, next) => {
@@ -206,57 +206,8 @@ const deleteUserById = async (req, res, next) => {
 const updateUserById = async (req, res, next) => {
     try {
         const userId = req.params.id;
-        const options = { password: 0 };
 
-        const user = await findWithId(User, userId, options);
-
-        const updateOptions = { new: true, runValidators: true, Context: 'query' };
-
-        let updates = {}
-
-        // if (req.body.name) {
-        //     updates.name = req.body.name;
-        // }
-
-        // if (req.body.password) {
-        //     updates.password = req.body.password;
-        // }
-
-        // if (req.body.phone) {
-        //     updates.phone = req.body.phone;
-        // }
-
-        // if (req.body.address) {
-        //     updates.address = req.body.address;
-        // }
-
-        for (let key in req.body) {
-            if (['name', 'password', 'phone', 'address'].includes(key)) {
-                updates[key] = req.body[key];
-            } else if (['email'].includes(key)) {
-                throw createError(400, 'Email can not be updated.');
-            }
-        }
-
-        const image = req.file?.path;
-
-        if (image) {
-            if (image.size > 1024 * 1024 * 2) {
-                throw createError(400, 'File size must be between 2 MB')
-            } 
-
-            // updates.image = image.buffer.toString('base64');
-            updates.image = image;
-            user.image != 'default.png' && deleteImage(user.image);
-        }
-
-        // delete updates.email;
-
-        const updatedUser = await User.findByIdAndUpdate(userId, updates, updateOptions).select("-password");
-
-        if (!updatedUser) {
-            throw createError(404, 'User with this id does not exist');
-        }
+        const updatedUser = await handleUpdateUserById(userId, req);
 
         return successResponse(res, {
             statusCode: 200,

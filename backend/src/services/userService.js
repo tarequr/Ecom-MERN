@@ -48,6 +48,65 @@ const findUserById = async (id, options={}) => {
     }
 }
 
+const handleUpdateUserById = async (userId, req) => {
+    try {
+        const options = { password: 0 };
+        const user = await findUserById(userId, options);
+
+        const updateOptions = { new: true, runValidators: true, Context: 'query' };
+
+        let updates = {}
+
+        // if (req.body.name) {
+        //     updates.name = req.body.name;
+        // }
+
+        // if (req.body.password) {
+        //     updates.password = req.body.password;
+        // }
+
+        // if (req.body.phone) {
+        //     updates.phone = req.body.phone;
+        // }
+
+        // if (req.body.address) {
+        //     updates.address = req.body.address;
+        // }
+
+        for (let key in req.body) {
+            if (['name', 'password', 'phone', 'address'].includes(key)) {
+                updates[key] = req.body[key];
+            } else if (['email'].includes(key)) {
+                throw createError(400, 'Email can not be updated.');
+            }
+        }
+
+        const image = req.file?.path;
+
+        if (image) {
+            if (image.size > 1024 * 1024 * 2) {
+                throw createError(400, 'File size must be between 2 MB')
+            } 
+
+            // updates.image = image.buffer.toString('base64');
+            updates.image = image;
+            user.image != 'default.png' && deleteImage(user.image);
+        }
+
+        // delete updates.email;
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updates, updateOptions).select("-password");
+
+        if (!updatedUser) {
+            throw createError(404, 'User with this id does not exist');
+        }
+        
+        return updatedUser;
+    } catch (error) {
+        throw (error);
+    }
+}
+
 const handleDeleteUserById = async (id) => {
     try {
         const user = await User.findByIdAndDelete({ _id: id, isAdmin: false });
@@ -90,4 +149,4 @@ const hadleUserAction = async (userId, action) => {
     }
 }
 
-module.exports = { findUsers, findUserById, handleDeleteUserById, hadleUserAction }
+module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction }
