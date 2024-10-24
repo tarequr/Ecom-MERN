@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const User = require("../models/userModel");
 const { deleteImage } = require("../helpers/deleteImage");
+const { default: mongoose } = require("mongoose");
 
 const findUsers = async (search, limit, page) => {
     try {
@@ -100,9 +101,12 @@ const handleUpdateUserById = async (userId, req) => {
         if (!updatedUser) {
             throw createError(404, 'User with this id does not exist');
         }
-        
+
         return updatedUser;
     } catch (error) {
+        if (error instanceof mongoose.Error.CastError) {
+            throw createError(400, 'Invalid ID');
+        }
         throw (error);
     }
 }
