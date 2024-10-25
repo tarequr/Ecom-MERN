@@ -11,7 +11,7 @@ const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
-const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById } = require('../services/userService');
+const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById, hadleUserPasswordUpdate } = require('../services/userService');
 
 
 const processRegister = async (req, res, next) => {
@@ -239,21 +239,10 @@ const handleManageUserStatusById = async (req, res, next) => {
 
 const handleUpdatePassword = async (req, res, next) => {
     try {
-        const { oldPassword, newPassword, confirmPassword } = req.body;
+        const { email, oldPassword, newPassword, confirmPassword } = req.body;
         const userId = req.params.id;
 
-        const user = await findUserById(userId);
-        const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
-
-        if (!isPasswordMatch) {
-            throw createError(401, 'Old password is not correct!');
-        }
-
-        const updatedUser = await User.findByIdAndUpdate(userId, { password:  newPassword }, { new: true }).select("-password");
-
-        if (!updatedUser) {
-            throw createError(400, 'Updated updated failed!');
-        }
+        const updatedUser = await hadleUserPasswordUpdate(email, userId, oldPassword, newPassword, confirmPassword)
 
         return successResponse(res, {
             statusCode: 200,

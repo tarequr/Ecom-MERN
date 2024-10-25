@@ -1,4 +1,5 @@
 const createError = require("http-errors");
+const bcrypt = require('bcryptjs');
 const User = require("../models/userModel");
 const { deleteImage } = require("../helpers/deleteImage");
 const { default: mongoose } = require("mongoose");
@@ -153,4 +154,35 @@ const hadleUserAction = async (userId, action) => {
     }
 }
 
-module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction }
+const hadleUserPasswordUpdate = async (email, userId, oldPassword, newPassword, confirmPassword) => {
+    try {
+        const user = await User.findOne({ email: email });
+        
+        if (!user) {
+            throw createError(400, 'User was not found with this email');
+        }
+
+        if (newPassword !== confirmPassword) {
+            throw createError(400, 'Confirmation password does not match the new password!');
+        }
+
+        const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+
+        if (!isPasswordMatch) {
+            throw createError(401, 'Old password is not correct!');
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, { password:  newPassword }, { new: true }).select("-password");
+
+        if (!updatedUser) {
+            throw createError(400, 'Updated updated failed!');
+        }
+
+        return updatedUser;
+    } catch (error) {
+        throw (error);
+    }
+}
+
+
+module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction, hadleUserPasswordUpdate }
