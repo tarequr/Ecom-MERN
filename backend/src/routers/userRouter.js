@@ -1,7 +1,7 @@
 const express = require('express');
-const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccount, updateUserById, handleManageUserStatusById } = require('../controllers/userController');
+const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword } = require('../controllers/userController');
 const uploadUserImage = require('../middleware/uploadFile');
-const { validateUserRegistration } = require('../validators/auth');
+const { validateUserRegistration, validateUserPasswordUpdate } = require('../validators/auth');
 const runValidation = require('../validators');
 const { isLoggedIn, isLoggedOut, isAdmin } = require('../middleware/auth');
 let router = express.Router();
@@ -18,10 +18,8 @@ router.get('/:id', isLoggedIn, isAdmin, getUserById);
 router.delete('/:id', isLoggedIn, deleteUserById);
 // #6 - Update One
 router.put('/:id', uploadUserImage.single("image"), isLoggedIn, updateUserById);
-// #7 - Banned Unbanned One
-router.put('/manage-user-status/:id', isLoggedIn, isAdmin, handleManageUserStatusById);
-// // #8 - UnBanned One
-// router.put('/unban-user/:id', isLoggedIn, isAdmin, handleUnBanUserById);
+// #7 - Update Password
+router.put('/update-password/:id', validateUserPasswordUpdate, runValidation, isLoggedIn, handleUpdatePassword);
 
 
 module.exports = router;

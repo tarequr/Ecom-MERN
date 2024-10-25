@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const fs = require('fs').promises;
 
 const User = require('../models/userModel');
@@ -236,27 +237,33 @@ const handleManageUserStatusById = async (req, res, next) => {
     }
 }
 
-// const handleUnBanUserById = async (req, res, next) => {
-//     try {
-//         const userId  = req.params.id;
-//         const user    = await findWithId(User, userId);
+const handleUpdatePassword = async (req, res, next) => {
+    try {
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        const userId = req.params.id;
 
-//         const updateOptions = { new: true, runValidators: true, Context: 'query' };
+        const user = await findUserById(userId);
+        const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
 
-//         const updatedUser = await User.findByIdAndUpdate(userId, { isBanned: false }, updateOptions).select("-password");
+        if (!isPasswordMatch) {
+            throw createError(401, 'Old password is not correct!');
+        }
 
-//         if (!updatedUser) {
-//             throw createError(400, 'User was not unbanned successfully');
-//         }
+        const updatedUser = await User.findByIdAndUpdate(userId, { password:  newPassword }, { new: true }).select("-password");
 
-//         return successResponse(res, {
-//             statusCode: 200,
-//             message: 'User Unbanned successfully',
-//             payload: { updatedUser }
-//         });
-//     } catch (error) {   
-//         next(error);
-//     }
-// }
+        if (!updatedUser) {
+            throw createError(400, 'Updated updated failed!');
+        }
 
-module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount, updateUserById, handleManageUserStatusById };
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Password updated successfully',
+            payload: { updatedUser }
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+
+module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword };

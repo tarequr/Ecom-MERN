@@ -64,5 +64,26 @@ const validateUserLogin = [
         .withMessage('The password field is required.')
 ];
 
+// password in validation
+const validateUserPasswordUpdate = [
+    body('oldPassword')
+        .trim()
+        .notEmpty()
+        .withMessage('The old password field is required.'),
+    body('newPassword')
+        .trim()
+        .notEmpty()
+        .withMessage('The new password field is required.')
+        .isLength({ min: 8 })
+        .withMessage('The name must be at least 8 characters long.')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+        .withMessage('Password should contain at least one uppercase letter, one lowercase letter, one number, and one special character.'),
+    body('confirmPassword').custom((value, {req}) => {
+        if (value != req.body.newPassword) {
+            throw new Error("Your confirmation password does not match the new password")
+        }
+        return true;
+    })
+];
 
-module.exports = { validateUserRegistration, validateUserLogin };
+module.exports = { validateUserRegistration, validateUserLogin, validateUserPasswordUpdate };
