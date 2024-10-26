@@ -86,4 +86,14 @@ const validateUserPasswordUpdate = [
     })
 ];
 
-module.exports = { validateUserRegistration, validateUserLogin, validateUserPasswordUpdate };
+// forget user in validation
+const validateUserForgetPassword = [
+    body('email')
+        .trim()
+        .notEmpty()
+        .withMessage('The email field is required.')
+        .isEmail()
+        .withMessage('Invalid email address.')
+];
+
+module.exports = { validateUserRegistration, validateUserLogin, validateUserPasswordUpdate, validateUserForgetPassword };

@@ -9,7 +9,7 @@ const { successResponse } = require('../helpers/responseHandler');
 const { findWithId } = require('../services/findItem');
 const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
-const { jwtActivationKey, clientURL } = require('../secret');
+const { jwtActivationKey, clientURL, jwtResetPasswordKey } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
 const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById, hadleUserPasswordUpdate } = require('../services/userService');
 
@@ -254,5 +254,43 @@ const handleUpdatePassword = async (req, res, next) => {
     }
 }
 
+const handleForgetPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const userData = await User.findOne({ email: email });
 
-module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword };
+        if (!userData) {
+            throw createError(404, 'Email is incorrect or you have not verified your email.');    
+        }
+
+        //create JWT token
+        const token = createJSONWebToken({ email }, jwtResetPasswordKey, '10m');
+
+        //prepare email
+        const emailData = {
+            email: email,
+            subject: 'Reset Password Email',
+            html: `
+                <h2>Hello ${userData.name} ! </h2>
+                <p>Please click here to <a href="${clientURL}/api/users/reset-password/${token}" target="_blank">Reset your password</a></p>
+            `,
+        }
+
+        try {
+            await emailWithNodeMailer(emailData);
+        } catch (error) {
+            next(createError(500, 'Failed to send reset password mail'));
+        }
+        
+        return successResponse(res, {
+            statusCode: 200,
+            message: `Please go to your ${email} for reseting your password`,
+            payload: { token }
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+
+module.exports = { processRegister, getUsers, getUserById, deleteUserById, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword, handleForgetPassword };

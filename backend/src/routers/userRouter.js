@@ -1,7 +1,7 @@
 const express = require('express');
-const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword } = require('../controllers/userController');
+const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword, handleForgetPassword } = require('../controllers/userController');
 const uploadUserImage = require('../middleware/uploadFile');
-const { validateUserRegistration, validateUserPasswordUpdate } = require('../validators/auth');
+const { validateUserRegistration, validateUserPasswordUpdate, validateUserForgetPassword } = require('../validators/auth');
 const runValidation = require('../validators');
 const { isLoggedIn, isLoggedOut, isAdmin } = require('../middleware/auth');
 let router = express.Router();
@@ -20,6 +20,8 @@ router.delete('/:id', isLoggedIn, deleteUserById);
 router.put('/:id', uploadUserImage.single("image"), isLoggedIn, updateUserById);
 // #7 - Update Password
 router.put('/update-password/:id', validateUserPasswordUpdate, runValidation, isLoggedIn, handleUpdatePassword);
+// #8 - Forget Password
+router.post('/forget-password', validateUserForgetPassword, runValidation, handleForgetPassword);
 
 
 module.exports = router;
