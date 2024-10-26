@@ -1,8 +1,11 @@
 const createError = require("http-errors");
 const bcrypt = require('bcryptjs');
 const User = require("../models/userModel");
+const { createJSONWebToken } = require('../helpers/jsonwebtoken');
+const { clientURL, jwtResetPasswordKey } = require('../secret');
 const { deleteImage } = require("../helpers/deleteImage");
 const { default: mongoose } = require("mongoose");
+const emailWithNodeMailer = require("../helpers/email");
 
 const findUsers = async (search, limit, page) => {
     try {
@@ -184,5 +187,37 @@ const hadleUserPasswordUpdate = async (email, userId, oldPassword, newPassword, 
     }
 }
 
+const hadleUserForgetPasswordByEmail = async (email) => {
+    try {
+        const userData = await User.findOne({ email: email });
 
-module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction, hadleUserPasswordUpdate }
+        if (!userData) {
+            throw createError(404, 'Email is incorrect or you have not verified your email.');    
+        }
+
+        //create JWT token
+        const token = createJSONWebToken({ email }, jwtResetPasswordKey, '10m');
+
+        //prepare email
+        const emailData = {
+            email: email,
+            subject: 'Reset Password Email',
+            html: `
+                <h2>Hello ${userData.name} ! </h2>
+                <p>Please click here to <a href="${clientURL}/api/users/reset-password/${token}" target="_blank">Reset your password</a></p>
+            `,
+        }
+
+        try {
+            await emailWithNodeMailer(emailData);
+        } catch (error) {
+            throw createError(500, 'Failed to send reset password mail');
+        }
+
+        return token;
+    } catch (error) {
+        throw (error);
+    }
+}
+
+module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail }
