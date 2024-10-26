@@ -11,7 +11,7 @@ const { deleteImage } = require('../helpers/deleteImage');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL, jwtResetPasswordKey } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
-const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail } = require('../services/userService');
+const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail, hadleUserResetPassword } = require('../services/userService');
 
 
 const processRegister = async (req, res, next) => {
@@ -273,18 +273,7 @@ const handleForgetPassword = async (req, res, next) => {
 const userResetPassword = async (req, res, next) => {
     try {
         const { token, password } = req.body;
-        const decoded = jwt.verify(token, jwtResetPasswordKey);
-        
-        if (!decoded) {
-            throw createError(400, "Invalid or expired token");
-        }
-
-        const filter = { email: decoded.email }
-        const updatedUser = await User.findOneAndUpdate(filter, { password:  password }, { new: true }).select("-password");
-
-        if (!updatedUser) {
-            throw createError(400, 'Password reset failed!');
-        }
+        const updatedUser = await hadleUserResetPassword(token, password);
         
         return successResponse(res, {
             statusCode: 200,

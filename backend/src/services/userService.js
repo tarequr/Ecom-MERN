@@ -1,5 +1,6 @@
 const createError = require("http-errors");
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require("../models/userModel");
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { clientURL, jwtResetPasswordKey } = require('../secret');
@@ -220,4 +221,25 @@ const hadleUserForgetPasswordByEmail = async (email) => {
     }
 }
 
-module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail }
+const hadleUserResetPassword = async (token, password) => {
+    try {
+        const decoded = jwt.verify(token, jwtResetPasswordKey);
+        
+        if (!decoded) {
+            throw createError(400, "Invalid or expired token");
+        }
+
+        const filter = { email: decoded.email }
+        const updatedUser = await User.findOneAndUpdate(filter, { password:  password }, { new: true }).select("-password");
+
+        if (!updatedUser) {
+            throw createError(400, 'Password reset failed!');
+        }
+
+        return updatedUser;
+    } catch (error) {
+        throw (error);
+    }
+}
+
+module.exports = { findUsers, findUserById, handleUpdateUserById, handleDeleteUserById, hadleUserAction, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail, hadleUserResetPassword }
