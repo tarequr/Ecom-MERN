@@ -178,7 +178,7 @@ const hadleUserPasswordUpdate = async (email, userId, oldPassword, newPassword, 
         const updatedUser = await User.findByIdAndUpdate(userId, { password:  newPassword }, { new: true }).select("-password");
 
         if (!updatedUser) {
-            throw createError(400, 'Updated updated failed!');
+            throw createError(400, 'Password updated failed!');
         }
 
         return updatedUser;

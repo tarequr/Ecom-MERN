@@ -86,7 +86,7 @@ const validateUserPasswordUpdate = [
     })
 ];
 
-// forget user in validation
+// forget password in validation
 const validateUserForgetPassword = [
     body('email')
         .trim()
@@ -96,4 +96,20 @@ const validateUserForgetPassword = [
         .withMessage('Invalid email address.')
 ];
 
-module.exports = { validateUserRegistration, validateUserLogin, validateUserPasswordUpdate, validateUserForgetPassword };
+// reset password in validation
+const validateUserResetPassword = [
+    body('token')
+        .trim()
+        .notEmpty()
+        .withMessage('The token field is required.'),
+    body('password')
+        .trim()
+        .notEmpty()
+        .withMessage('The password field is required.')
+        .isLength({ min: 8 })
+        .withMessage('The name must be at least 8 characters long.')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+        .withMessage('Password should contain at least one uppercase letter, one lowercase letter, one number, and one special character.'),
+];
+
+module.exports = { validateUserRegistration, validateUserLogin, validateUserPasswordUpdate, validateUserForgetPassword, validateUserResetPassword };

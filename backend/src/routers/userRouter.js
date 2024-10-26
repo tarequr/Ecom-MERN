@@ -1,7 +1,7 @@
 const express = require('express');
-const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword, handleForgetPassword } = require('../controllers/userController');
+const { getUsers, getUserById, deleteUserById, processRegister, activeUserAccount, updateUserById, handleManageUserStatusById, handleUpdatePassword, handleForgetPassword, userResetPassword } = require('../controllers/userController');
 const uploadUserImage = require('../middleware/uploadFile');
-const { validateUserRegistration, validateUserPasswordUpdate, validateUserForgetPassword } = require('../validators/auth');
+const { validateUserRegistration, validateUserPasswordUpdate, validateUserForgetPassword, validateUserResetPassword } = require('../validators/auth');
 const runValidation = require('../validators');
 const { isLoggedIn, isLoggedOut, isAdmin } = require('../middleware/auth');
 let router = express.Router();
@@ -10,17 +10,19 @@ let router = express.Router();
 router.post('/process-register', uploadUserImage.single("image"), isLoggedOut, validateUserRegistration, runValidation, processRegister);
 // #2 - Process Register
 router.post('/active', isLoggedOut, activeUserAccount);
-// #3 - Featch All
+// #3 - Reset Password
+router.put('/reset-password', validateUserResetPassword, runValidation, userResetPassword);
+// #4 - Featch All
 router.get('/', isLoggedIn, getUsers);
-// #4 - Featch One
+// #5 - Featch One
 router.get('/:id', isLoggedIn, isAdmin, getUserById);
-// #5 - Delete One
+// #6 - Delete One
 router.delete('/:id', isLoggedIn, deleteUserById);
-// #6 - Update One
+// #7 - Update One
 router.put('/:id', uploadUserImage.single("image"), isLoggedIn, updateUserById);
-// #7 - Update Password
+// #8 - Update Password
 router.put('/update-password/:id', validateUserPasswordUpdate, runValidation, isLoggedIn, handleUpdatePassword);
-// #8 - Forget Password
+// #9 - Forget Password
 router.post('/forget-password', validateUserForgetPassword, runValidation, handleForgetPassword);
 
 
