@@ -37,6 +37,15 @@ const handleLogin = async (req, res, next) => {
             sameSite: 'none',
         });
 
+        //refresh JWT token
+        const refreshToken = createJSONWebToken({ user }, jwtAccessKey, '7d');
+        res.cookie('refreshToken', refreshToken, {
+            maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
+
         const userWithoutPassword = await User.findOne({ email }).select("-password");
 
         return successResponse(res, {
@@ -62,4 +71,21 @@ const handleLogout = async (req, res, next) => {
     }
 }
 
-module.exports = { handleLogin, handleLogout };
+const handleRefreshToken = async (req, res, next) => {
+    try {
+        res.clearCookie('accessToken');
+        const oldRefreshToken = req.cookie.refreshToken;
+
+        //verify the old refresh token
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User logged out successfully!'
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+
+module.exports = { handleLogin, handleLogout, handleRefreshToken };
