@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const { successResponse } = require('../helpers/responseHandler');
-const { jwtAccessKey } = require('../secret');
+const { jwtAccessKey, jwtRefreshKey } = require('../secret');
 const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 
 
@@ -31,14 +31,15 @@ const handleLogin = async (req, res, next) => {
         //create JWT token
         const accessToken = createJSONWebToken({ user }, jwtAccessKey, '15m');
         res.cookie('accessToken', accessToken, {
-            maxAge: 15 * 60 * 1000,  // 15 minutes
+            // maxAge: 15 * 60 * 1000,  // 15 minutes
+            maxAge: 1 * 60 * 1000,  // 15 minutes
             httpOnly: true,
             secure: true,
             sameSite: 'none',
         });
 
         //refresh JWT token
-        const refreshToken = createJSONWebToken({ user }, jwtAccessKey, '7d');
+        const refreshToken = createJSONWebToken({ user }, jwtRefreshKey, '7d');
         res.cookie('refreshToken', refreshToken, {
             maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
             httpOnly: true,
@@ -73,14 +74,27 @@ const handleLogout = async (req, res, next) => {
 
 const handleRefreshToken = async (req, res, next) => {
     try {
-        res.clearCookie('accessToken');
-        const oldRefreshToken = req.cookie.refreshToken;
+        const oldRefreshToken = req.cookies.refreshToken;
 
         //verify the old refresh token
+        const decodedToken = jwt.verify(oldRefreshToken, jwtRefreshKey);
+
+        if (!decodedToken) {
+            throw createError(401, 'Invalid refresh token. Please login again.');
+        }
+
+        //create JWT token
+        const accessToken = createJSONWebToken( decodedToken.user , jwtAccessKey, '1m');
+        res.cookie('accessToken', accessToken, {
+            maxAge: 15 * 60 * 1000,  // 15 minutes
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
 
         return successResponse(res, {
             statusCode: 200,
-            message: 'User logged out successfully!'
+            message: 'New access token is generated!'
         });
     } catch (error) {   
         next(error);
