@@ -5,9 +5,10 @@ const { jwtAccessKey } = require("../secret");
 const isLoggedIn = async (req, res, next) => {
     try {
         const accessToken = req.cookies.accessToken;
+        const refreshToken = req.cookies.refreshToken;
 
-        if (!accessToken) {
-            throw createError(401, 'Access token not found');
+        if (!accessToken || !refreshToken) {
+            throw createError(401, 'Token not found');
         }
 
         const decoded = jwt.verify(accessToken, jwtAccessKey);
