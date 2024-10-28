@@ -15,13 +15,13 @@ router.put('/reset-password', validateUserResetPassword, runValidation, userRese
 // #4 - Featch All
 router.get('/', isLoggedIn, getUsers);
 // #5 - Featch One
-router.get('/:id', isLoggedIn, isAdmin, getUserById);
+router.get('/:id([0-9a-fA-F]{24})', isLoggedIn, isAdmin, getUserById);
 // #6 - Delete One
-router.delete('/:id', isLoggedIn, deleteUserById);
+router.delete('/:id([0-9a-fA-F]{24})', isLoggedIn, deleteUserById);
 // #7 - Update One
-router.put('/:id', uploadUserImage.single("image"), isLoggedIn, updateUserById);
+router.put('/:id([0-9a-fA-F]{24})', uploadUserImage.single("image"), isLoggedIn, updateUserById);
 // #8 - Update Password
-router.put('/update-password/:id', validateUserPasswordUpdate, runValidation, isLoggedIn, handleUpdatePassword);
+router.put('/update-password/:id([0-9a-fA-F]{24})', validateUserPasswordUpdate, runValidation, isLoggedIn, handleUpdatePassword);
 // #9 - Forget Password
 router.post('/forget-password', validateUserForgetPassword, runValidation, handleForgetPassword);
 
