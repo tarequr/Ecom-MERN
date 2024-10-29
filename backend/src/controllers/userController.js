@@ -12,6 +12,8 @@ const { createJSONWebToken } = require('../helpers/jsonwebtoken');
 const { jwtActivationKey, clientURL, jwtResetPasswordKey } = require('../secret');
 const emailWithNodeMailer = require('../helpers/email');
 const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail, hadleUserResetPassword } = require('../services/userService');
+const { checkUserExists } = require('../helpers/checkUserExists');
+const { sendEmail } = require('../helpers/sendEmail');
 
 
 const processRegister = async (req, res, next) => {
@@ -44,7 +46,7 @@ const processRegister = async (req, res, next) => {
             throw createError(400, 'File size must be between 2 MB')
         }
 
-        const userExists = await User.exists({ email: email });
+        const userExists = await checkUserExists(email);
 
         if (userExists) {
             throw createError(409, 'User already exists');
@@ -69,11 +71,7 @@ const processRegister = async (req, res, next) => {
             `,
         }
 
-        try {
-            await emailWithNodeMailer(emailData);
-        } catch (error) {
-            next(createError(500, 'Failed to send verification mail'));
-        }
+        sendEmail(emailData);
         
         return successResponse(res, {
             statusCode: 200,

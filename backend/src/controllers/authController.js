@@ -29,12 +29,12 @@ const handleLogin = async (req, res, next) => {
         }
 
         //create JWT token
-        const accessToken = createJSONWebToken({ user }, jwtAccessKey, '15m');
+        const accessToken = createJSONWebToken({ user }, jwtAccessKey, '5m');
         res.cookie('accessToken', accessToken, {
             // maxAge: 15 * 60 * 1000,  // 15 minutes
-            maxAge: 1 * 60 * 1000,  // 15 minutes
+            maxAge: 5 * 60 * 1000,  // 5 minutes
             httpOnly: true,
-            secure: true,
+            // secure: true,
             sameSite: 'none',
         });
 
@@ -43,7 +43,7 @@ const handleLogin = async (req, res, next) => {
         res.cookie('refreshToken', refreshToken, {
             maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
             httpOnly: true,
-            secure: true,
+            // secure: true,
             sameSite: 'none',
         });
 
@@ -85,11 +85,11 @@ const handleRefreshToken = async (req, res, next) => {
         }
 
         //create JWT token
-        const accessToken = createJSONWebToken( decodedToken.user , jwtAccessKey, '1m');
+        const accessToken = createJSONWebToken( decodedToken.user , jwtAccessKey, '5m');
         res.cookie('accessToken', accessToken, {
-            maxAge: 15 * 60 * 1000,  // 15 minutes
+            maxAge: 5 * 60 * 1000,  // 5 minutes
             httpOnly: true,
-            secure: true,
+            // secure: true,
             sameSite: 'none',
         });
 

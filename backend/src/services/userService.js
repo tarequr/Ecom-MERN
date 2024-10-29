@@ -7,6 +7,7 @@ const { clientURL, jwtResetPasswordKey } = require('../secret');
 const { deleteImage } = require("../helpers/deleteImage");
 const { default: mongoose } = require("mongoose");
 const emailWithNodeMailer = require("../helpers/email");
+const { sendEmail } = require("../helpers/sendEmail");
 
 const findUsers = async (search, limit, page) => {
     try {
@@ -209,11 +210,7 @@ const hadleUserForgetPasswordByEmail = async (email) => {
             `,
         }
 
-        try {
-            await emailWithNodeMailer(emailData);
-        } catch (error) {
-            throw createError(500, 'Failed to send reset password mail');
-        }
+        sendEmail(emailData);
 
         return token;
     } catch (error) {
