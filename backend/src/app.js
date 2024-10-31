@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/users', require('./routers/userRouter.js'));
 app.use('/api/seed', require('./routers/seedRouter.js'));
 app.use('/api/auth', require('./routers/authRouter.js'));
+app.use('/api/categories', require('./routers/categoryRouter.js'));
 
 
 
