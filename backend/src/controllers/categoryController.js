@@ -1,7 +1,7 @@
 const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
-const { createCategory, getCategories } = require('../services/categoryService');
+const { createCategory, getCategories, singleCategory } = require('../services/categoryService');
 
 const handleCreateCategory = async (req, res, next) => {
     try {
@@ -32,4 +32,19 @@ const handleGetCategory = async (req, res, next) => {
     }
 }
 
-module.exports = { handleCreateCategory, handleGetCategory };
+const handleSingleCategory = async (req, res, next) => {
+    try {
+        const { slug } = req.params;
+        const category = await singleCategory(slug);
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Category fetched successfully!',
+            payload:  category 
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { handleCreateCategory, handleGetCategory, handleSingleCategory };

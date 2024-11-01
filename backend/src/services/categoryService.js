@@ -1,5 +1,6 @@
 const slugify = require('slugify');
 const Category = require('../models/categoryModel');
+const createError = require('http-errors');
 
 const createCategory = async (req) => {
     const { name } = req.body;
@@ -7,8 +8,13 @@ const createCategory = async (req) => {
     return newCategory;
 }
 
-const getCategories = async (req) => {
+const getCategories = async () => {
     return await Category.find({}).select('name slug').lean();
 }
 
-module.exports = { createCategory, getCategories };
+const singleCategory = async (slug) => {
+    const category = await Category.find({slug}).select('name slug').lean();
+    return category;
+}
+
+module.exports = { createCategory, getCategories, singleCategory };

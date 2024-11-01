@@ -2,7 +2,7 @@ const express = require('express');
 const runValidation = require('../validators');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
 const { validateCategory } = require('../validators/category');
-const { handleCreateCategory, handleGetCategory } = require('../controllers/categoryController');
+const { handleCreateCategory, handleGetCategory, handleSingleCategory } = require('../controllers/categoryController');
 
 let router = express.Router();
 
@@ -10,5 +10,7 @@ let router = express.Router();
 router.post('/', validateCategory, runValidation, isLoggedIn, isAdmin, handleCreateCategory);
 // #2 - Get All Category
 router.get('/', handleGetCategory);
+// #3 - Get Single Category
+router.get('/:slug', handleSingleCategory);
 
 module.exports = router;
