@@ -1,26 +1,17 @@
-const mongoose = require('mongoose');
-const createError = require('http-errors');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const fs = require('fs').promises;
-;
+const slugify = require('slugify');
+const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
-
-const { createJSONWebToken } = require('../helpers/jsonwebtoken');
-const { jwtActivationKey, clientURL, jwtResetPasswordKey } = require('../secret');
-const emailWithNodeMailer = require('../helpers/email');
-
-const { sendEmail } = require('../helpers/sendEmail');
-
 
 const handleCreateCategory = async (req, res, next) => {
     try {
         const { name } = req.body;
+        
+        const newCategory = await Category.create({ name: name, slug: slugify(name) });
 
         return successResponse(res, {
             statusCode: 200,
             message: 'Category created successfully!',
-            payload: { name }
+            payload: { newCategory }
         });
     } catch (error) {   
         next(error);
