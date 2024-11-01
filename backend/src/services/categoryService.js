@@ -7,4 +7,8 @@ const createCategory = async (req) => {
     return newCategory;
 }
 
-module.exports = { createCategory };
+const getCategories = async (req) => {
+    return await Category.find({}).select('name slug').lean();
+}
+
+module.exports = { createCategory, getCategories };
