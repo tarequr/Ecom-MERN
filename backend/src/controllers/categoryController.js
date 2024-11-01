@@ -1,7 +1,8 @@
 const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
-const { createCategory, getCategories, singleCategory } = require('../services/categoryService');
+const { createCategory, getCategories, singleCategory, updateCategory } = require('../services/categoryService');
+const createError = require('http-errors');
 
 const handleCreateCategory = async (req, res, next) => {
     try {
@@ -9,7 +10,7 @@ const handleCreateCategory = async (req, res, next) => {
         const newCategory = await createCategory(name);
 
         return successResponse(res, {
-            statusCode: 200,
+            statusCode: 201,
             message: 'Category created successfully!',
             payload: { newCategory }
         });
@@ -47,4 +48,23 @@ const handleSingleCategory = async (req, res, next) => {
     }
 }
 
-module.exports = { handleCreateCategory, handleGetCategory, handleSingleCategory };
+const handleUpdateCategory = async (req, res, next) => {
+    try {
+        const { name } = req.body;
+        const { slug } = req.params;
+        const category = await updateCategory(name, slug);
+
+        if (!category) {
+            throw createError(404, 'Category not found!');
+        }
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Category updated successfully!',
+            payload:  category 
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { handleCreateCategory, handleGetCategory, handleSingleCategory, handleUpdateCategory };
