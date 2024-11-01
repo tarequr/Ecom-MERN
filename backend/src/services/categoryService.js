@@ -25,4 +25,8 @@ const updateCategory = async (name, slug) => {
     return await Category.findOneAndUpdate(filter, updates, options);
 }
 
-module.exports = { createCategory, getCategories, singleCategory, updateCategory };
+const deleteCategory = async (slug) => {
+    return await Category.findOneAndDelete({slug});
+}
+
+module.exports = { createCategory, getCategories, singleCategory, updateCategory, deleteCategory };

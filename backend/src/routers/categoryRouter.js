@@ -2,7 +2,7 @@ const express = require('express');
 const runValidation = require('../validators');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
 const { validateCategory } = require('../validators/category');
-const { handleCreateCategory, handleGetCategory, handleSingleCategory, handleUpdateCategory } = require('../controllers/categoryController');
+const { handleCreateCategory, handleGetCategory, handleSingleCategory, handleUpdateCategory, handleDeleteCategory } = require('../controllers/categoryController');
 
 let router = express.Router();
 
@@ -13,6 +13,8 @@ router.get('/', handleGetCategory);
 // #3 - Get Single Category
 router.get('/:slug', handleSingleCategory);
 // #4 - Update Category
-router.put('/:slug', handleUpdateCategory);
+router.put('/:slug', validateCategory, runValidation, isLoggedIn, isAdmin, handleUpdateCategory);
+// #5 - Delete Category
+router.delete('/:slug', isLoggedIn, isAdmin, handleDeleteCategory);
 
 module.exports = router;
