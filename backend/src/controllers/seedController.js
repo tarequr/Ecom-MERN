@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 const User = require('../models/userModel');
 const data = require('../data');
+const Product = require('../models/productModel');
 
 const seedUser = async (req, res, next) => {
     try {
@@ -16,4 +17,18 @@ const seedUser = async (req, res, next) => {
     }
 }
 
-module.exports = { seedUser };
+const seedProduct = async (req, res, next) => {
+    try {
+        // Deleting all products
+        await Product.deleteMany({});
+
+        // Inserting new products
+        const products = await Product.insertMany(data.products);
+
+        res.status(201).send(products);
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { seedUser, seedProduct };
