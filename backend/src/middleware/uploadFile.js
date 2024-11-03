@@ -2,7 +2,7 @@ const multer  = require('multer')
 const fs = require('fs');  // Make sure to import the 'fs' module
 // const path = require('path');
 // const createError = require('http-errors');
-const { UPLOAD_USER_IMG_DIRECTORY, MAX_FILE_SIZE, FILE_TYPES } = require('../config');
+const { UPLOAD_USER_IMG_DIRECTORY, UPLOAD_PRODUCT_IMG_DIRECTORY, MAX_FILE_SIZE, FILE_TYPES } = require('../config');
 
 // Ensure the upload directory exists, or create it
 // if (!fs.existsSync(UPLOAD_USER_IMG_DIRECTORY)) {
@@ -27,6 +27,15 @@ const { UPLOAD_USER_IMG_DIRECTORY, MAX_FILE_SIZE, FILE_TYPES } = require('../con
 const userStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, UPLOAD_USER_IMG_DIRECTORY)
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const productStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, UPLOAD_PRODUCT_IMG_DIRECTORY)
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
@@ -76,4 +85,10 @@ const uploadUserImage = multer({
     fileFilter: fileFilter
 });
 
-module.exports = uploadUserImage;
+const uploadProductImage = multer({ 
+    storage: productStorage,
+    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: fileFilter
+});
+
+module.exports = { uploadUserImage, uploadProductImage };
