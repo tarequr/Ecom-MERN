@@ -29,6 +29,10 @@ const validateProduct = [
         .withMessage('The quantity field is required.')
         .isInt({ min: 1 })
         .withMessage('Quantity must be a positive integer.'),
+    body('image')
+        .optional()
+        .isString()
+        .withMessage('The image field is optional.'),
 ];
 
 module.exports = { validateProduct };

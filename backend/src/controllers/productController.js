@@ -7,12 +7,17 @@ const Product = require('../models/productModel');
 
 const handleCreateProduct = async (req, res, next) => {
     try {
-        const { name, description, price, quantity, sold, shipping, category } = req.body;
+        // const { name, description, price, quantity, sold, shipping, category } = req.body;
 
         const image = req.file?.path;
 
-        const productData = { name, description, price, quantity, sold, shipping, category, image };
-        const product = await createProduct(productData);
+        // const productData = { name, description, price, quantity, sold, shipping, category };
+
+        // if (image) {
+        //     productData.image = image;
+        // }
+
+        const product = await createProduct(req.body, image);
 
         return successResponse(res, {
             statusCode: 201,
