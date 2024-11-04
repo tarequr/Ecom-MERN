@@ -2,7 +2,7 @@ const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
 const createError = require('http-errors');
-const { createProduct } = require('../services/productService');
+const { createProduct, getProducts } = require('../services/productService');
 const Product = require('../models/productModel');
 
 const handleCreateProduct = async (req, res, next) => {
@@ -29,5 +29,21 @@ const handleCreateProduct = async (req, res, next) => {
     }
 }
 
+const handleGetProduct = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
 
-module.exports = { handleCreateProduct };
+        const products = await getProducts();
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Product fetched successfully!',
+            payload:  { length: products.length, products} 
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { handleCreateProduct, handleGetProduct };

@@ -22,4 +22,8 @@ const createProduct = async (productData, image) => {
     return product;
 }
 
-module.exports = { createProduct };
+const getProducts = async () => {
+    return await Product.find({});
+}
+
+module.exports = { createProduct, getProducts };
