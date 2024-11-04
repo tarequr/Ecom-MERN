@@ -2,7 +2,7 @@ const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
 const createError = require('http-errors');
-const { createProduct, getProducts } = require('../services/productService');
+const { createProduct, getProducts, singleProduct } = require('../services/productService');
 const Product = require('../models/productModel');
 
 const handleCreateProduct = async (req, res, next) => {
@@ -29,6 +29,14 @@ const handleCreateProduct = async (req, res, next) => {
     }
 }
 
+/**
+ * @description Fetches a paginated list of products.
+ * @route GET /api/products
+ * @param {object} req - The request object, containing query parameters for pagination.
+ * @param {object} res - The response object to send the results.
+ * @param {function} next - The next middleware function in the stack.
+ * @returns {object} - A success response with product data and pagination details.
+ */
 const handleGetProduct = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -55,4 +63,25 @@ const handleGetProduct = async (req, res, next) => {
     }
 }
 
-module.exports = { handleCreateProduct, handleGetProduct };
+/**
+ * @description Get a single product by its slug
+ * @route GET /api/products/:slug
+ * @param {string} slug - The slug of the product to be fetched
+ * @returns {object} - The product object
+ */
+const handleSingleProduct = async (req, res, next) => {
+    try {
+        const { slug } = req.params;
+        const product = await singleProduct(slug);
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Product fetched successfully!',
+            payload:  product 
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { handleCreateProduct, handleGetProduct, handleSingleProduct };

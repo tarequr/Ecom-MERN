@@ -38,4 +38,11 @@ const getProducts = async (page, limit) => {
     return { products, count: productsCount };
 }
 
-module.exports = { createProduct, getProducts };
+const singleProduct = async (slug) => {
+    const product = await Product.findOne({slug}).populate('category');
+    if (!product) throw createError(404, 'Product not found!');
+
+    return product;
+}
+
+module.exports = { createProduct, getProducts, singleProduct };
