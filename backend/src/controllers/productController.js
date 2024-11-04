@@ -39,7 +39,16 @@ const handleGetProduct = async (req, res, next) => {
         return successResponse(res, {
             statusCode: 200,
             message: 'Product fetched successfully!',
-            payload:  { count, products} 
+            payload:  {  
+                pagination: {
+                    totalPages: Math.ceil(count / limit),
+                    currentPage: page,
+                    previousPage: page - 1,
+                    nextPage: page + 1,
+                    totalNumberOfProducts: count,
+                },
+                products
+            } 
         });
     } catch (error) {   
         next(error);
