@@ -45,4 +45,10 @@ const singleProduct = async (slug) => {
     return product;
 }
 
-module.exports = { createProduct, getProducts, singleProduct };
+const deleteProduct = async (slug) => {
+    const product = await Product.findOneAndDelete({slug});
+    if (!product) throw createError(404, 'Product not found!');
+    return product;
+}
+
+module.exports = { createProduct, getProducts, singleProduct, deleteProduct };

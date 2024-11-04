@@ -2,7 +2,7 @@ const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
 const createError = require('http-errors');
-const { createProduct, getProducts, singleProduct } = require('../services/productService');
+const { createProduct, getProducts, singleProduct, deleteProduct } = require('../services/productService');
 const Product = require('../models/productModel');
 
 const handleCreateProduct = async (req, res, next) => {
@@ -84,4 +84,24 @@ const handleSingleProduct = async (req, res, next) => {
     }
 }
 
-module.exports = { handleCreateProduct, handleGetProduct, handleSingleProduct };
+/**
+ * @description Deletes a product by its slug
+ * @route DELETE /api/products/:slug
+ * @param {string} slug - The slug of the product to be deleted
+ * @returns {object} - A success response with a message of 'Product deleted successfully!'
+ */
+const handleDeleteProduct = async (req, res, next) => {
+    try {
+        const { slug } = req.params;
+        await deleteProduct(slug);
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Product deleted successfully!'
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
+module.exports = { handleCreateProduct, handleGetProduct, handleSingleProduct, handleDeleteProduct };
