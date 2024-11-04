@@ -34,12 +34,12 @@ const handleGetProduct = async (req, res, next) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 5;
 
-        const products = await getProducts();
+        const {products, count } = await getProducts(page, limit);
 
         return successResponse(res, {
             statusCode: 200,
             message: 'Product fetched successfully!',
-            payload:  { length: products.length, products} 
+            payload:  { count, products} 
         });
     } catch (error) {   
         next(error);

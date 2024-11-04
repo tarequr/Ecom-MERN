@@ -22,8 +22,20 @@ const createProduct = async (productData, image) => {
     return product;
 }
 
-const getProducts = async () => {
-    return await Product.find({}).populate('category');
+const getProducts = async (page, limit) => {
+    const products = await Product.find({})
+        .populate('category')
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort({ createdAt: -1 });
+
+    if (!products) {
+        throw createError(404, 'Products not found!'); // 404 Not Found
+    }
+
+    const productsCount = await Product.find({}).countDocuments();
+
+    return { products, count: productsCount };
 }
 
 module.exports = { createProduct, getProducts };
