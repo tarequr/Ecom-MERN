@@ -23,7 +23,7 @@ const createProduct = async (productData, image) => {
 }
 
 const getProducts = async () => {
-    return await Product.find({});
+    return await Product.find({}).populate('category');
 }
 
 module.exports = { createProduct, getProducts };
