@@ -1,6 +1,7 @@
 const slugify = require('slugify');
 const Product = require('../models/productModel');
 const createError = require('http-errors');
+const { deleteImage } = require('../helpers/deleteImage');
 
 const createProduct = async (productData, image) => {
     if (image && image.size > 1024 * 1024 * 2) {
@@ -45,9 +46,20 @@ const singleProduct = async (slug) => {
     return product;
 }
 
+/**
+ * Deletes a product by its slug
+ * @param {string} slug - The slug of the product to be deleted
+ * @returns {object} - The deleted product object
+ * @throws {Error} - If the product is not found.
+ */
 const deleteProduct = async (slug) => {
     const product = await Product.findOneAndDelete({slug});
     if (!product) throw createError(404, 'Product not found!');
+
+    if (product.image) {
+        deleteImage(product.image)
+    }
+
     return product;
 }
 
