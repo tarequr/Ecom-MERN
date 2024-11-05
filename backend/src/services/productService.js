@@ -46,6 +46,15 @@ const singleProduct = async (slug) => {
     return product;
 }
 
+const updateProduct = async (slug) => {
+    const filter  = { slug };
+    const updates = { $set: { name: name, slug: slugify(name) } };
+    const options = { new: true };
+
+    return await Product.findOneAndUpdate(filter, updates, options);
+}
+
+
 /**
  * Deletes a product by its slug
  * @param {string} slug - The slug of the product to be deleted
@@ -63,4 +72,4 @@ const deleteProduct = async (slug) => {
     return product;
 }
 
-module.exports = { createProduct, getProducts, singleProduct, deleteProduct };
+module.exports = { createProduct, getProducts, singleProduct, updateProduct, deleteProduct };

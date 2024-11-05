@@ -2,7 +2,7 @@ const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const { successResponse } = require('../helpers/responseHandler');
 const createError = require('http-errors');
-const { createProduct, getProducts, singleProduct, deleteProduct } = require('../services/productService');
+const { createProduct, getProducts, singleProduct, deleteProduct, updateProduct } = require('../services/productService');
 const Product = require('../models/productModel');
 
 const handleCreateProduct = async (req, res, next) => {
@@ -84,6 +84,57 @@ const handleSingleProduct = async (req, res, next) => {
     }
 }
 
+const handleUpdateProduct = async (req, res, next) => {
+    try {
+        const { slug } = req.params;
+        const updateOptions = { new: true, runValidators: true, Context: 'query' };
+        let updates = {};
+
+        const allowedFields = ['name', 'description', 'price', 'quantity', 'sold', 'shipping'];
+
+        for (let key in req.body) {
+            if (allowedFields.includes(key)) {
+                updates[key] = req.body[key];
+            }
+        }
+
+        if (updates.name) {
+            updates.slug = slugify(updates.name);
+        }
+
+        const image = req.file?.path;
+
+        if (image) {
+            if (image.size > 1024 * 1024 * 2) {
+                throw createError(400, 'File size must be between 2 MB')
+            } 
+
+            // updates.image = image.buffer.toString('base64');
+            updates.image = image;
+            // user.image != 'default.png' && deleteImage(user.image);
+        }
+
+        // const category = await updateCategory(name, slug);
+
+        // const updatedUser = await updateProduct(slug, req);
+        
+
+        const updateProduct = await Product.findOneAndUpdate({ slug }, updates, updateOptions);
+
+        if (!updateProduct) {
+            throw createError(404, 'Product not found!');
+        }
+        
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Product updated successfully',
+            payload: updateProduct
+        });
+    } catch (error) {   
+        next(error);
+    }
+}
+
 /**
  * @description Deletes a product by its slug
  * @route DELETE /api/products/:slug
@@ -104,4 +155,4 @@ const handleDeleteProduct = async (req, res, next) => {
     }
 }
 
-module.exports = { handleCreateProduct, handleGetProduct, handleSingleProduct, handleDeleteProduct };
+module.exports = { handleCreateProduct, handleGetProduct, handleSingleProduct, handleUpdateProduct, handleDeleteProduct };
