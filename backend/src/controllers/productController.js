@@ -39,10 +39,20 @@ const handleCreateProduct = async (req, res, next) => {
  */
 const handleGetProduct = async (req, res, next) => {
     try {
+        const search = req.query.search || "";
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 5;
 
-        const {products, count } = await getProducts(page, limit);
+        const searchRegex = new RegExp('.*' + search + '.*', 'i');  // here 'i' means case insensitive
+        const filter = {
+            isAdmin: {$ne: true},    //The $ne operator in MongoDB stands for "not equal"
+            $or: [
+                { name: { $regex: searchRegex } },    // Match if 'name' field matches regex pattern
+            ]
+        }
+
+        const {products, count } = await getProducts(page, limit, filter);
 
         return successResponse(res, {
             statusCode: 200,
