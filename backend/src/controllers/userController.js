@@ -14,6 +14,8 @@ const emailWithNodeMailer = require('../helpers/email');
 const { hadleUserAction, findUsers, findUserById, handleDeleteUserById, handleUpdateUserById, hadleUserPasswordUpdate, hadleUserForgetPasswordByEmail, hadleUserResetPassword } = require('../services/userService');
 const { checkUserExists } = require('../helpers/checkUserExists');
 const { sendEmail } = require('../helpers/sendEmail');
+const cloudinary = require('../config/cloudinary');
+
 
 
 const processRegister = async (req, res, next) => {
@@ -97,6 +99,16 @@ const activeUserAccount = async (req, res, next) => {
 
             if (userExists) {
                 throw createError(409, 'User already exists. Please sign in');
+            }
+
+            const image = decoded.image;
+
+            if (image) {
+                const respose = await cloudinary.uploader.upload(image, {
+                    folder: "ecommerceMern",
+                });
+
+                decoded.image = respose.secure_url;
             }
 
             const user = await User.create(decoded);

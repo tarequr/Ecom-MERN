@@ -25,9 +25,9 @@ const { UPLOAD_USER_IMG_DIRECTORY, UPLOAD_PRODUCT_IMG_DIRECTORY, MAX_FILE_SIZE, 
 
 // 3rd way
 const userStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, UPLOAD_USER_IMG_DIRECTORY)
-    },
+    // destination: function (req, file, cb) {
+    //     cb(null, UPLOAD_USER_IMG_DIRECTORY)
+    // },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
     }
