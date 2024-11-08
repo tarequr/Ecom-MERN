@@ -4,6 +4,8 @@ const { successResponse } = require('../helpers/responseHandler');
 const createError = require('http-errors');
 const { createProduct, getProducts, singleProduct, deleteProduct, updateProduct } = require('../services/productService');
 const Product = require('../models/productModel');
+const cloudinary = require('../config/cloudinary');
+const { publicIdWithoutExtensionFromUrl, deleteFileFromCloudinary } = require('../helpers/cloudinaryHelper');
 
 const handleCreateProduct = async (req, res, next) => {
     try {
@@ -97,6 +99,12 @@ const handleSingleProduct = async (req, res, next) => {
 const handleUpdateProduct = async (req, res, next) => {
     try {
         const { slug } = req.params;
+        const product = await Product.findOne({ slug: slug });
+
+        if (!product) {
+            throw createError(404, 'Product not found!');
+        }
+
         const updateOptions = { new: true, runValidators: true, Context: 'query' };
         let updates = {};
 
@@ -120,8 +128,14 @@ const handleUpdateProduct = async (req, res, next) => {
             } 
 
             // updates.image = image.buffer.toString('base64');
-            updates.image = image;
+            // updates.image = image;
             // user.image != 'default.png' && deleteImage(user.image);
+
+            const respose = await cloudinary.uploader.upload(image, {
+                folder: "ecommerceMern/products",
+            });
+    
+            updates.image = respose.secure_url;            
         }
 
         // const category = await updateCategory(name, slug);
@@ -133,6 +147,11 @@ const handleUpdateProduct = async (req, res, next) => {
 
         if (!updateProduct) {
             throw createError(404, 'Product not found!');
+        }
+
+        if (product.image) {
+            const publicId = await publicIdWithoutExtensionFromUrl(product.image);
+            deleteFileFromCloudinary('products', publicId, 'Product');
         }
         
         return successResponse(res, {
