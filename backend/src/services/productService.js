@@ -9,8 +9,16 @@ const createProduct = async (productData, image) => {
         throw createError(400, 'File size must be between 2 MB');
     }
 
+    // if (image) {
+    //     productData.image = image;
+    // }
+
     if (image) {
-        productData.image = image;
+        const respose = await cloudinary.uploader.upload(image, {
+            folder: "ecommerceMern/products",
+        });
+
+        productData.image = respose.secure_url;
     }
 
     const productExists = await Product.exists({ name: productData.name });
