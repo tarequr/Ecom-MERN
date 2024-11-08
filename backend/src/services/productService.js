@@ -2,6 +2,7 @@ const slugify = require('slugify');
 const Product = require('../models/productModel');
 const createError = require('http-errors');
 const { deleteImage } = require('../helpers/deleteImage');
+const cloudinary = require('../config/cloudinary');
 
 const createProduct = async (productData, image) => {
     if (image && image.size > 1024 * 1024 * 2) {
@@ -62,14 +63,25 @@ const updateProduct = async (slug) => {
  * @throws {Error} - If the product is not found.
  */
 const deleteProduct = async (slug) => {
-    const product = await Product.findOneAndDelete({slug});
-    if (!product) throw createError(404, 'Product not found!');
+    try {
+        const existingProduct = await Product.findOneAndDelete({slug});
+        if (!existingProduct) throw createError(404, 'Product not found!');
 
-    if (product.image) {
-        deleteImage(product.image)
+        if (existingProduct.image) {
+            // deleteImage(existingProduct.image)
+            const publicId = await publicIdWithoutExtensionFromUrl(existingProduct.image);
+
+            const { result } = await cloudinary.uploader.destroy(`ecommerceMern/prosucts/${publicId}`);
+
+            if (result !== 'ok') {
+                throw createError(400, 'Product image was not deleted');
+            }
+        }
+
+        await Product.findOneAndDelete({slug});
+    } catch (error) {
+        throw (error);
     }
-
-    return product;
 }
 
 module.exports = { createProduct, getProducts, singleProduct, updateProduct, deleteProduct };
