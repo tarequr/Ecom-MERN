@@ -3,6 +3,7 @@ const Product = require('../models/productModel');
 const createError = require('http-errors');
 const { deleteImage } = require('../helpers/deleteImage');
 const cloudinary = require('../config/cloudinary');
+const { publicIdWithoutExtensionFromUrl } = require('../helpers/cloudinaryHelper');
 
 const createProduct = async (productData, image) => {
     if (image && image.size > 1024 * 1024 * 2) {
@@ -79,7 +80,7 @@ const deleteProduct = async (slug) => {
             // deleteImage(existingProduct.image)
             const publicId = await publicIdWithoutExtensionFromUrl(existingProduct.image);
 
-            const { result } = await cloudinary.uploader.destroy(`ecommerceMern/prosucts/${publicId}`);
+            const { result } = await cloudinary.uploader.destroy(`ecommerceMern/products/${publicId}`);
 
             if (result !== 'ok') {
                 throw createError(400, 'Product image was not deleted');
