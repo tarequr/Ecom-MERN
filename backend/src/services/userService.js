@@ -9,7 +9,7 @@ const { default: mongoose } = require("mongoose");
 const emailWithNodeMailer = require("../helpers/email");
 const { sendEmail } = require("../helpers/sendEmail");
 const cloudinary = require('../config/cloudinary');
-const { publicIdWithoutExtensionFromUrl } = require("../helpers/cloudinaryHelper");
+const { publicIdWithoutExtensionFromUrl, deleteFileFromCloudinary } = require("../helpers/cloudinaryHelper");
 
 const findUsers = async (search, limit, page) => {
     try {
@@ -126,12 +126,7 @@ const handleDeleteUserById = async (id) => {
         if (existingUser && existingUser.image) {
             // deleteImage(existingUser.image)
             const publicId = await publicIdWithoutExtensionFromUrl(existingUser.image);
-
-            const { result } = await cloudinary.uploader.destroy(`ecommerceMern/users/${publicId}`);
-
-            if (result !== 'ok') {
-                throw createError(400, 'User image was not deleted');
-            }
+            deleteFileFromCloudinary('users', publicId, 'User');
         }
 
         await User.findByIdAndDelete({ _id: id, isAdmin: false });
