@@ -1,10 +1,11 @@
 import React from 'react';
 import './App.css'
+import Index from './routes';
 
 function App() {
   return (
     <>
-      <h1>Hello World, I am a React Developer.</h1>
+      <Index />
     </>
   )
 }
