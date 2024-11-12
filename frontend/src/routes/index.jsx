@@ -5,19 +5,23 @@ import Login from "../pages/Login";
 import Cart from "../pages/Cart";
 import Error from "../pages/Error";
 import Navbar from "../layouts/Navbar";
+import Footer from "../layouts/Footer";
 
-const  index = () => {
+const index = () => {
   return (
     <BrowserRouter>
-      <Navbar/>
+      <Navbar />
+      <main>
         <Routes>
-            <Route path="/" element={<Home/>}/>
-            <Route path="/register" element={<Register/>}/>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/logout" element={<Login/>}/>
-            <Route path="/cart" element={<Cart/>}/>
-            <Route path="/*" element={<Error/>}/>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Login />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/*" element={<Error />} />
         </Routes>
+      </main>
+      <Footer />
     </BrowserRouter>
   )
 }
