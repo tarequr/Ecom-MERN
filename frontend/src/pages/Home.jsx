@@ -1,6 +1,7 @@
 import React from 'react'
 import PageTitle from '../components/PageTitle'
 import ProductSidebar from '../components/ProductSidebar'
+import Counter from '../components/Counter'
 
 
 function Home() {
@@ -13,6 +14,7 @@ function Home() {
         </div>
         <div className='main-container'>
           <h2>List of All products</h2>
+          <Counter />
         </div>
       </div>
     </>
